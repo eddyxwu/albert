@@ -1,0 +1,20 @@
+{
+    "name": "Sagittarius A*",
+    "mass_kg": 8.26e36,
+    "mass_solar": 4.154e6,
+    "description": "Supermassive black hole at the center of Milky Way",
+    "schwarzschild_radius_m": 1.227e10,
+    "typical_orbits": {
+        "ISCO": 6.0,
+        "photon_sphere": 3.0,
+        "S2_orbit": 971.0,
+        "stable_circular": [100.0, 500.0, 1000.0]
+    },
+    "integration_parameters": {
+        "dtau_geometric": 0.01,
+        "max_steps": 10000,
+        "r_min": 2.1,
+        "r_max": 5000.0
+    },
+    "notes": "Well-studied with stellar orbits, 2020 Nobel Prize for discovery"
+}

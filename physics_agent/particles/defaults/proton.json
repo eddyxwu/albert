@@ -1,0 +1,15 @@
+{
+    "name": "Proton",
+    "particle_type": "massive",
+    "mass": 1.6726219e-27,
+    "charge": 1.60217663e-19,
+    "spin": 0.5,
+    "color": "red",
+    "orbital_parameters": {
+        "description": "Parameters for heavy particle dynamics near black holes",
+        "angular_velocity_factor": 0.8,
+        "radial_velocity_factor": 0.0,
+        "orbit_type": "circular",
+        "comments": "Circular orbit for better visualization"
+    }
+} 

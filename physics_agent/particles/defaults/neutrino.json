@@ -1,0 +1,15 @@
+{
+    "name": "Neutrino",
+    "particle_type": "massless",
+    "mass": 0.0,
+    "charge": 0.0,
+    "spin": 0.5,
+    "color": "green",
+    "orbital_parameters": {
+        "description": "Parameters for massless particle dynamics",
+        "angular_velocity_factor": 1.2,
+        "radial_velocity_factor": -0.1,
+        "orbit_type": "circular_fast",
+        "comments": "Massless particle with slight inward motion for stability"
+    }
+} 

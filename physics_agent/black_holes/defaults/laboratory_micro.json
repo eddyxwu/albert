@@ -1,0 +1,19 @@
+{
+    "name": "Laboratory Micro Black Hole",
+    "mass_kg": 1.0e8,
+    "mass_solar": 5.03e-23,
+    "description": "Theoretical micro black hole that could be created in particle accelerators",
+    "schwarzschild_radius_m": 1.485e-19,
+    "typical_orbits": {
+        "ISCO": 6.0,
+        "photon_sphere": 3.0,
+        "stable_circular": [10.0, 20.0, 50.0, 100.0]
+    },
+    "integration_parameters": {
+        "dtau_geometric": 1.0,
+        "max_steps": 1000000,
+        "r_min": 2.1,
+        "r_max": 10000.0
+    },
+    "notes": "Extreme case for quantum gravity effects, very large timesteps possible, quantum effects dominate"
+}

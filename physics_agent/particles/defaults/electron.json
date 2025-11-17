@@ -1,0 +1,15 @@
+{
+    "name": "Electron",
+    "particle_type": "massive",
+    "mass": 9.1093837e-31,
+    "charge": -1.60217663e-19,
+    "spin": 0.5,
+    "color": "blue",
+    "orbital_parameters": {
+        "description": "Parameters for orbital dynamics near black holes",
+        "angular_velocity_factor": 1.0,
+        "radial_velocity_factor": 0.0,
+        "orbit_type": "circular",
+        "comments": "Perfect circular orbit with no radial motion"
+    }
+} 
