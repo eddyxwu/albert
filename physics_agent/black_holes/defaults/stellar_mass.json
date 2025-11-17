@@ -1,0 +1,19 @@
+{
+    "name": "Stellar Mass Black Hole",
+    "mass_kg": 1.989e31,
+    "mass_solar": 10.0,
+    "description": "Typical stellar-mass black hole from core collapse",
+    "schwarzschild_radius_m": 29533.839,
+    "typical_orbits": {
+        "ISCO": 6.0,
+        "photon_sphere": 3.0,
+        "stable_circular": [10.0, 20.0, 50.0, 100.0]
+    },
+    "integration_parameters": {
+        "dtau_geometric": 0.01,
+        "max_steps": 10000,
+        "r_min": 2.1,
+        "r_max": 1000.0
+    },
+    "notes": "Common endpoint of massive star evolution, numerically well-behaved"
+}

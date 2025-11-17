@@ -1,0 +1,16 @@
+{
+    "name": "Photon",
+    "particle_type": "massless",
+    "mass": 0.0,
+    "charge": 0.0,
+    "spin": 1,
+    "color": "#FFD700",
+    "orbital_parameters": {
+        "description": "Parameters for light bending near black holes",
+        "angular_velocity_factor": 1.5,
+        "radial_velocity_factor": 0.0,
+        "orbit_type": "deflection",
+        "comments": "Hyperbolic orbit showing gravitational light deflection",
+        "photon_sphere_factor": 1.0
+    }
+} 
