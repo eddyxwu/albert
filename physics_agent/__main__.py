@@ -207,14 +207,33 @@ For more information on each command, use: albert <command> --help
         # Convert namespace to list for evaluation
         sys.argv = ['albert-run']  # Set program name
         
-        # Add all the arguments
+        # Get the default values from the parser to avoid forwarding defaults
+        from physics_agent.cli import get_cli_parser
+        cli_parser = get_cli_parser()
+        defaults = {action.dest: action.default for action in cli_parser._actions if hasattr(action, 'dest')}
+        
+        # Add all the arguments that differ from defaults or are explicitly set
+        # FIX: sweepable_fields needs underscore (--sweepable_fields), not dash
+        # The run_parser loses the --sweepable-fields alias during argument copying
+        keys_needing_underscore = {'sweepable_fields'}
+        
         for key, value in vars(args).items():
             if key not in ['command'] and value is not None:
+                # Skip if value is the same as default (unless it's a boolean flag that's True)
+                if key in defaults and value == defaults[key] and not isinstance(value, bool):
+                    continue
+                
+                # Use underscore for specific args, dash for all others
+                if key in keys_needing_underscore:
+                    flag = f'--{key}'  # keep underscore: --sweepable_fields
+                else:
+                    flag = f'--{key.replace("_", "-")}'  # convert: --theory-filter
+                
                 if isinstance(value, bool):
                     if value:
-                        sys.argv.append(f'--{key.replace("_", "-")}')
+                        sys.argv.append(flag)
                 else:
-                    sys.argv.append(f'--{key.replace("_", "-")}')
+                    sys.argv.append(flag)
                     sys.argv.append(str(value))
         
         # Run evaluation and get results
