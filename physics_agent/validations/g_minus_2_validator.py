@@ -6,6 +6,7 @@ Properly implements all required abstract methods.
 import numpy as np
 import torch
 from typing import Dict, Any, Tuple
+import sympy as sp
 from .base_validation import PredictionValidator, ValidationResult
 
 class GMinus2Validator(PredictionValidator):
@@ -135,7 +136,17 @@ class GMinus2Validator(PredictionValidator):
                     qg_correction = scale_ratio * 0.05  # LQG area quantization
                 elif hasattr(theory, 'alpha'):
                     # Use theory's coupling parameter
-                    qg_correction = theory.alpha * scale_ratio**2
+                    # Convert sympy Symbol to numeric if needed
+                    alpha_val = theory.alpha
+                    if isinstance(alpha_val, sp.Basic):
+                        # If it's a sympy expression, try to evaluate it
+                        # For symbolic parameters, use a default small value
+                        try:
+                            alpha_val = float(alpha_val.evalf())
+                        except:
+                            # If evaluation fails, use a default coupling
+                            alpha_val = 0.1
+                    qg_correction = alpha_val * scale_ratio**2
                 else:
                     qg_correction = scale_ratio**2 * 0.01  # Generic QG
                 
@@ -154,11 +165,26 @@ class GMinus2Validator(PredictionValidator):
             theory_error = sm_data['error']
         
         # Calculate statistics
+        # Convert sympy expressions to numeric values if needed
+        def to_numeric(val):
+            """Convert sympy expressions to numeric values"""
+            if isinstance(val, sp.Basic):
+                try:
+                    return float(val.evalf())
+                except:
+                    # If evaluation fails, return a default
+                    return float(val) if hasattr(val, '__float__') else 0.0
+            return float(val) if not isinstance(val, (int, float)) else val
+        
+        theory_prediction = to_numeric(theory_prediction)
+        theory_error = to_numeric(theory_error)
+        
         diff = theory_prediction - exp_data['value']
         combined_error = np.sqrt(theory_error**2 + exp_data['error']**2)
         
         # Chi-squared test
         chi_squared = (diff / combined_error)**2 if combined_error > 0 else float('inf')
+        chi_squared = to_numeric(chi_squared)
         
         # SM chi-squared for comparison
         sm_diff = sm_data['value'] - exp_data['value']
@@ -187,11 +213,11 @@ class GMinus2Validator(PredictionValidator):
         result.sota_source = sm_data['source']
         # <reason>chain: Only mark as beating SOTA if chi_squared is strictly less than SM chi_squared</reason>
         # To avoid floating point precision issues, require a meaningful improvement
-        result.beats_sota = chi_squared < sm_chi_squared * 0.99  # At least 1% better
+        result.beats_sota = float(chi_squared) < float(sm_chi_squared) * 0.99  # At least 1% better
         
         if result.beats_sota:
             result.performance = 'beats'
-        elif abs(chi_squared - sm_chi_squared) < 0.1:
+        elif abs(float(chi_squared) - float(sm_chi_squared)) < 0.1:
             result.performance = 'matches'
         else:
             result.performance = 'below'
