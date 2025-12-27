@@ -1,44 +1,83 @@
-# Quantum Unification Theory Template
+# Novel Gravitational Theory Generator
 
-Generate a Python class that:
-1. Inherits from GravitationalTheory
-2. Has category = "quantum" 
-3. Unifies gravity with electromagnetism or other forces
-4. Includes quantum field terms in the Lagrangian
+Generate a Python class implementing a CREATIVE and UNIQUE gravitational theory.
+
+**CRITICAL: BE CREATIVE!**
+- Each theory should use a DIFFERENT mathematical approach
+- Don't just use sqrt(rs/r) corrections - try something new!
+- Explore different physical mechanisms and mathematical forms
 
 Initial idea: {initial_prompt}
 
-Use these exact imports:
+## Possible Approaches (pick ONE or invent your own):
+
+1. **f(R) Gravity**: Add R², R³, or log(R) terms to the action
+   - correction = alpha * (rs/r)**n  where n ≠ 1
+   
+2. **Scalar-Tensor**: Couple a scalar field φ to gravity
+   - correction = phi(r) * (rs/r)  where phi(r) varies with distance
+   
+3. **Yukawa-like**: Exponential decay/enhancement
+   - correction = alpha * exp(-r/lambda) or alpha * exp(-lambda/r)
+   
+4. **Power-law**: Different radial dependence
+   - correction = alpha * (r/rs)**n  or alpha * (rs/r)**n
+   
+5. **Logarithmic**: Log corrections to potential
+   - correction = alpha * log(r/rs) / r
+   
+6. **Oscillatory**: Periodic modifications
+   - correction = alpha * sin(r/lambda) / r
+   
+7. **Transition functions**: Smooth interpolation between regimes
+   - correction = alpha * tanh((r - r0)/delta)
+   
+8. **Higher-order curvature**: Gauss-Bonnet-like terms
+   - correction = alpha * (rs/r)**2 * (1 + beta*(rs/r))
+
+## Required imports:
+```python
 import torch
 import sympy as sp
 from physics_agent.base_theory import GravitationalTheory
+```
 
-Structure your class like this:
-
+## Template:
+```python
 class CustomTheory(GravitationalTheory):
-    category = "quantum"
+    category = "modified_gravity"  # or "quantum", "scalar_tensor", etc.
     
-    def __init__(self, coupling=0.1):
-        super().__init__(name="Quantum Unified Theory")
-        self.coupling = coupling
+    def __init__(self, alpha=0.01, scale=1e6):  # NON-ZERO defaults!
+        super().__init__(name="Descriptive Name Here")
+        self.alpha = alpha  # Store as instance variable
+        self.scale = scale
         
-        # Define Lagrangian symbols
-        R = sp.Symbol('R')  # Ricci scalar
-        F = sp.Symbol('F')  # EM field strength
-        T = sp.Symbol('T')  # Torsion (if requested)
-        
-        # Your Lagrangian here - must include quantum unification terms
-        self.lagrangian = R + ...
-        
-    def get_metric(self, r, M_param, C_param, G_param):
+    def get_metric(self, r, M_param, C_param, G_param, **kwargs):
         rs = 2 * G_param * M_param / C_param**2
         
-        # Implement your modified metric
-        g_tt = -(1 - rs/r)  # modify as needed
-        g_rr = 1/(1 - rs/r) # modify as needed
+        # YOUR CREATIVE MODIFICATION - must use self.alpha (non-zero!)
+        correction = self.alpha * torch.exp(-r / self.scale)  # Example
+        
+        f = 1 - rs/r + correction
+        f = torch.maximum(f, torch.tensor(1e-10, device=r.device))
+        
+        g_tt = -f
+        g_rr = 1/f
         g_pp = r**2
         g_tp = torch.zeros_like(r)
-        
         return g_tt, g_rr, g_pp, g_tp
+```
 
-Generate only the Python code. No explanations or markdown. 
+## BAD (don't do this):
+- Just using Schwarzschild: g_tt = -(1 - rs/r)
+- Always using sqrt(rs/r) - try something different!
+- Copy-pasting the same correction every time
+- Setting parameters to 0 by default (alpha=0 is CHEATING!)
+- Using kwargs.get('param', 0) - corrections MUST be active!
+
+## CRITICAL:
+- All correction parameters MUST have NON-ZERO defaults (e.g., alpha=0.01, not alpha=0)
+- The correction term MUST be active when the class is instantiated with default parameters
+- Store parameters as self.param in __init__, don't use kwargs.get()
+
+Generate ONLY Python code. Be mathematically creative!

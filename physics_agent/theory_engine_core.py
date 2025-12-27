@@ -594,16 +594,18 @@ class TheoryEngine:
         # <reason>chain: Respect show_pbar parameter from kwargs</reason>
         show_outer_pbar = kwargs.get('show_pbar', True)  # Default to True for backward compatibility
         particle_pbars = {}
+        is_tty = sys.stderr.isatty()
         for idx, particle_name in enumerate(particle_names):
             particle_pbars[particle_name] = tqdm(
                 total=N_STEPS,
                 desc=f"    {particle_name}",
                 unit=" steps",
-                position=idx,  # Start from position 0
+                position=idx if is_tty else None,  # Only use position in interactive terminal
                 leave=False,  # <reason>chain: Clean up progress bars after completion to avoid duplicates</reason>
-                ncols=100,
-                bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]',
-                disable=not show_outer_pbar  # <reason>chain: Disable progress bar if requested</reason>
+                file=sys.stderr,
+                dynamic_ncols=True,
+                bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}',
+                disable=not show_outer_pbar or not is_tty  # <reason>chain: Disable if not interactive</reason>
             )
         
         # <reason>chain: Use ThreadPoolExecutor for parallel particle computation</reason>
@@ -1359,10 +1361,11 @@ class TheoryEngine:
         pbar = tqdm(range(N_STEPS), 
                    desc=pbar_desc,
                    unit=' steps',
-                   disable=not show_pbar,
+                   disable=not show_pbar or not sys.stderr.isatty(),
                    leave=False,  # Don't leave the bar after completion
-                   ncols=100,    # Fixed width for consistency
-                   bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]')
+                   file=sys.stderr,
+                   dynamic_ncols=True,
+                   bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}')
         
         for i in pbar:
             # Progress callback (for backward compatibility)
@@ -4685,8 +4688,10 @@ def main():
     theory_pbar = tqdm(theories_to_run.items(), 
                       desc="Processing theories",
                       unit=" theory",
-                      ncols=100,
-                      bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]')
+                      disable=not sys.stderr.isatty(),
+                      file=sys.stderr,
+                      dynamic_ncols=True,
+                      bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}')
     
     for name, model_prototype in theory_pbar:
         # <reason>chain: Update progress bar with current theory name</reason>

@@ -32,11 +32,9 @@ class LLMApi:
             self.model = "claude-4-opus"
             print("Warning: Anthropic support is experimental. xAI/Grok is the primary supported provider.")
         elif provider == "gemini":
-            # Experimental support
             self.api_key = os.getenv("GOOGLE_API_KEY", "")
             self.base_url = "https://generativelanguage.googleapis.com/v1beta"
-            self.model = "gemini-pro"
-            print("Warning: Google Gemini support is experimental. xAI/Grok is the primary supported provider.")
+            self.model = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
         else:
             raise ValueError(f"Unsupported provider: {provider}")
         
@@ -79,17 +77,15 @@ Return ONLY the Python code, no explanations."""
         """Fix common errors in generated code"""
         if not code:
             return code
-            
-        # Strip markdown code blocks
-        if '```python' in code:
-            # Extract code between ```python and ```
-            start = code.find('```python') + 9
-            end = code.find('```', start)
-            if end > start:
-                code = code[start:end].strip()
-        elif '```' in code:
-            # Strip any code blocks
-            code = code.replace('```', '')
+        
+        import re
+        # Robust markdown extraction - handle ```python, ```Python, ``` variations
+        match = re.search(r'```(?:[Pp]ython)?\s*\n(.*?)```', code, re.DOTALL)
+        if match:
+            code = match.group(1).strip()
+        else:
+            # Fallback: strip any remaining ``` markers
+            code = code.replace('```python', '').replace('```Python', '').replace('```', '')
             
         # Fix incorrect imports
         code = code.replace('from gravitational_theory import', 'from physics_agent.base_theory import')
@@ -171,7 +167,7 @@ Return ONLY the Python code, no explanations."""
                 ],
                 "model": self.model,
                 "stream": False,
-                "temperature": 0.7
+                "temperature": 0.9  # Higher temperature for more creative outputs
             }
             
             try:
@@ -190,7 +186,40 @@ Return ONLY the Python code, no explanations."""
                 print(f"API call failed: {e}")
                 return None
                 
-        elif self.provider in ["openai", "anthropic", "gemini"]:
+        elif self.provider == "gemini":
+            # Google Gemini API
+            headers = {"Content-Type": "application/json"}
+            
+            data = {
+                "contents": [{
+                    "parts": [{"text": prompt}]
+                }],
+                "systemInstruction": {
+                    "parts": [{"text": "You are an expert theoretical physicist specializing in gravitational theories and general relativity."}]
+                },
+                "generationConfig": {
+                    "temperature": 0.9,  # Higher temperature for more creative outputs
+                    "maxOutputTokens": 4096
+                }
+            }
+            
+            try:
+                response = requests.post(
+                    f"{self.base_url}/models/{self.model}:generateContent?key={self.api_key}",
+                    headers=headers,
+                    json=data,
+                    timeout=300
+                )
+                response.raise_for_status()
+                
+                result = response.json()
+                return result['candidates'][0]['content']['parts'][0]['text']
+                
+            except Exception as e:
+                print(f"Gemini API call failed: {e}")
+                return None
+                
+        elif self.provider in ["openai", "anthropic"]:
             # Experimental providers - not fully implemented
             print(f"Note: {self.provider} support is experimental. Full implementation pending.")
             print("Using mock response for now.")

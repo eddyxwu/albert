@@ -217,10 +217,11 @@ class UnifiedTrajectoryCalculator:
         pbar = tqdm(range(time_steps), 
                    desc=pbar_desc,
                    unit=' steps',
-                   disable=False,  # Always show progress
+                   disable=not sys.stderr.isatty(),  # Only show in interactive terminal
                    leave=False,    # Don't leave the bar after completion
-                   ncols=100,      # Fixed width for consistency
-                   bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]')
+                   file=sys.stderr,  # Use stderr for proper cursor control
+                   dynamic_ncols=True,  # Adjust to terminal width
+                   bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt}')
         
         for i in pbar:
             # <reason>chain: Convert h to float for rk4_step</reason>
